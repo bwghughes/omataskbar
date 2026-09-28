@@ -2,9 +2,17 @@
 
 Live system stats on the Apple Silicon Touch Bar, drawn in your Omarchy theme. It is written in Rust and replaces `tiny-dfr`.
 
-```
-esc │  │ CPU ▁▂▅▃ 14% │ ▂▅▁▃▂▁▁▂ │ MEM 4.3G/15G ▬▬▬── │ top: mpv 75% · claude 7% │ ↓2.9K ↑1.1K │ 6.2W 43° │ 90% │ 18:17 │ ⏯ │ 🔉 │ 🔊
-```
+![Stats layer](docs/stats.png)
+
+<sub>Controls layer (tap the Omarchy logo)</sub>
+
+![Controls layer](docs/controls.png)
+
+<sub>Holding Fn</sub>
+
+![Function keys](docs/fkeys.png)
+
+<sub>These are real frames from `omataskbar preview`, drawn at the Touch Bar's native 2170×60 in the Hackerman theme.</sub>
 
 - **Stats layer (default).** It shows:
   - CPU %, with a 60-second sparkline
