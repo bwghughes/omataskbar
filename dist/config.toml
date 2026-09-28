@@ -1,0 +1,86 @@
+# omataskbar — built-in defaults.
+#
+# Override any of this in /etc/omataskbar/config.toml (changes apply live).
+# Top-level keys there win; a [Layers] entry there replaces the layer of the
+# same name here, so copy a whole layer before tweaking it.
+
+Font = "JetBrainsMono Nerd Font:bold"
+
+# Written by the Omarchy theme-set hook; missing file = Tokyo Night colours.
+Theme = "/var/lib/omataskbar/colors.toml"
+
+AdaptiveBrightness = true   # follow the main display's brightness
+ActiveBrightness = 128      # 0–255, the ceiling of that curve
+
+DefaultLayer = "stats"      # what the bar shows normally
+FnLayer = "fkeys"           # what it shows while Fn is held
+LayerTimeout = 10           # seconds before a tapped-open layer falls back
+
+LayerOrder = ["stats", "controls", "fkeys"]
+
+# Items, left to right. Each one is ONE of:
+#   { Widget = "cpu" }             live stat: cpu cores mem top net power temp
+#                                  fan battery clock load uptime
+#   { Glyph = "\U000F057E" }       Nerd Font icon  (or Text = "esc")
+#   { Logo = true }                the Omarchy logo
+# plus optional:
+#   Action = "VolumeUp"            key(s) to send, see
+#                                  https://docs.rs/input-linux/latest/input_linux/enum.Key.html
+#   Layer = "controls"             switch layer on tap (tap again to go back)
+#   Stretch = 2.0                  relative width
+#
+# Widgets can have an Action too: Prog1 arrives in Hyprland as XF86Launch1,
+# which install.sh binds to btop.
+
+[Layers]
+stats = [
+    { Text = "esc", Action = "Esc", Stretch = 0.85 },
+    { Logo = true, Layer = "controls", Stretch = 0.85 },
+    { Widget = "cpu", Action = "Prog1" },
+    { Widget = "cores", Action = "Prog1" },
+    { Widget = "mem", Action = "Prog1" },
+    { Widget = "top", Action = "Prog1" },
+    { Widget = "net" },
+    { Widget = "power" },
+    { Widget = "battery" },
+    { Widget = "clock" },
+    { Glyph = "\U000F040E", Action = "PlayPause", Stretch = 0.85 },
+    { Glyph = "\U000F0580", Action = "VolumeDown", Stretch = 0.85 },
+    { Glyph = "\U000F057E", Action = "VolumeUp", Stretch = 0.85 },
+]
+
+# Everything the old media layer had. Tap the logo on the stats layer.
+controls = [
+    { Text = "esc", Action = "Esc" },
+    { Glyph = "\U000F004D", Layer = "stats" },
+    { Glyph = "\U000F00DE", Action = "BrightnessDown" },
+    { Glyph = "\U000F00E0", Action = "BrightnessUp" },
+    { Glyph = "\U000F036D", Action = "MicMute" },
+    { Logo = true, Action = "Search" },
+    { Glyph = "\U000F033E", Action = "Mail" },
+    { Glyph = "\U000F0E51", Action = "WWW" },
+    { Glyph = "\U000F0594", Action = "Config" },  # XF86Tools in Hyprland
+    { Glyph = "\U000F04AE", Action = "PreviousSong" },
+    { Glyph = "\U000F040E", Action = "PlayPause" },
+    { Glyph = "\U000F04AD", Action = "NextSong" },
+    { Glyph = "\U000F075F", Action = "Mute" },
+    { Glyph = "\U000F0580", Action = "VolumeDown" },
+    { Glyph = "\U000F057E", Action = "VolumeUp" },
+]
+
+# Held Fn.
+fkeys = [
+    { Text = "esc", Action = "Esc" },
+    { Text = "F1", Action = "F1" },
+    { Text = "F2", Action = "F2" },
+    { Text = "F3", Action = "F3" },
+    { Text = "F4", Action = "F4" },
+    { Text = "F5", Action = "F5" },
+    { Text = "F6", Action = "F6" },
+    { Text = "F7", Action = "F7" },
+    { Text = "F8", Action = "F8" },
+    { Text = "F9", Action = "F9" },
+    { Text = "F10", Action = "F10" },
+    { Text = "F11", Action = "F11" },
+    { Text = "F12", Action = "F12" },
+]
