@@ -25,6 +25,7 @@ const G_TEMP: &str = "\u{F050F}";
 const G_FAN: &str = "\u{F0210}";
 const G_LOAD: &str = "\u{F029A}";
 const G_UPTIME: &str = "\u{F051F}";
+const G_KBD: &str = "\u{F030C}";
 const G_CHARGING: &str = "\u{F0084}";
 const G_BATTERY: [&str; 10] = [
     "\u{F007A}", "\u{F007B}", "\u{F007C}", "\u{F007D}", "\u{F007E}",
@@ -46,6 +47,7 @@ pub enum Widget {
     Clock,
     Load,
     Uptime,
+    Kbd,
 }
 
 impl Widget {
@@ -63,6 +65,7 @@ impl Widget {
             "clock" | "time" => Widget::Clock,
             "load" => Widget::Load,
             "uptime" => Widget::Uptime,
+            "kbd" | "keyboard" => Widget::Kbd,
             _ => return None,
         })
     }
@@ -72,6 +75,7 @@ impl Widget {
             Widget::Cpu => 2.4,
             Widget::Cores => 1.4,
             Widget::Mem => 2.0,
+            Widget::Kbd => 3.0,
             Widget::Top => 2.2,
             Widget::Net => 1.4,
             Widget::Power => 1.3,
@@ -462,6 +466,17 @@ impl<'a> Painter<'a> {
                 let label = if d > 0 { format!("{d}d{hr}h") } else { format!("{hr}h{m:02}m") };
                 set(self.c, t.fg);
                 self.text(f, 17.0, &label, (gx + right) / 2.0, cy, Align::Center);
+            }
+            Widget::Kbd => {
+                let Some(v) = s.kbd else {
+                    set(self.c, t.dim);
+                    self.text(f, 16.0, "no keyboard backlight", x + w / 2.0, cy, Align::Center);
+                    return;
+                };
+                let gx = self.icon(G_KBD, x, cy, t.accent);
+                set(self.c, t.fg);
+                let pw = self.text(f, 17.0, &format!("{:.0}%", v * 100.0), right, cy, Align::Right);
+                self.bar(gx + 6.0, cy - 5.0, right - pw - gx - 18.0, 10.0, v, t.accent);
             }
             Widget::Battery => {
                 let Some(b) = s.battery else {

@@ -268,6 +268,8 @@ fn daemon() -> Result<()> {
     let mut last_touch = Instant::now();
     let mut needs_redraw = true;
     let mut last_bl = backlight.current_bl();
+    // Brightness keys go through Hyprland, so re-read levels shortly after a tap.
+    let mut levels_at: Option<Instant> = None;
 
     loop {
         let now = Instant::now();
@@ -277,6 +279,11 @@ fn daemon() -> Result<()> {
             if next_tick < now {
                 next_tick = now + TICK;
             }
+            needs_redraw = true;
+        }
+        if levels_at.is_some_and(|t| now >= t) {
+            stats.sample_levels();
+            levels_at = None;
             needs_redraw = true;
         }
         if base_layer != cfg.default_layer
@@ -305,7 +312,8 @@ fn daemon() -> Result<()> {
         }
         last_bl = bl;
 
-        let wait = next_tick.saturating_duration_since(Instant::now()).as_millis().min(u16::MAX as u128) as u16;
+        let wake = levels_at.map_or(next_tick, |t| t.min(next_tick));
+        let wait = wake.saturating_duration_since(Instant::now()).as_millis().min(u16::MAX as u128) as u16;
         match epoll.wait(&mut [EpollEvent::new(EpollFlags::EPOLLIN, 0)], wait) {
             Err(Errno::EINTR) | Ok(_) => {}
             Err(e) => return Err(e.into()),
@@ -381,6 +389,9 @@ fn daemon() -> Result<()> {
                             if it.pressed {
                                 it.pressed = false;
                                 toggle_keys(&mut uinput, &it.cfg.action, 0);
+                                if !it.cfg.action.is_empty() {
+                                    levels_at = Some(Instant::now() + Duration::from_millis(250));
+                                }
                                 if let Some(target) = &it.cfg.layer {
                                     let t = cfg.layers.iter().position(|x| &x.name == target).unwrap_or(cfg.default_layer);
                                     base_layer = if base_layer == t { cfg.default_layer } else { t };

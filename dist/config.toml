@@ -13,14 +13,14 @@ AdaptiveBrightness = true   # follow the main display's brightness
 ActiveBrightness = 128      # 0–255, the ceiling of that curve
 
 DefaultLayer = "stats"      # what the bar shows normally
-FnLayer = "fkeys"           # what it shows while Fn is held
+FnLayer = "keyboard"        # what it shows while Fn is held
 LayerTimeout = 10           # seconds before a tapped-open layer falls back
 
-LayerOrder = ["stats", "controls", "fkeys"]
+LayerOrder = ["stats", "controls", "keyboard"]
 
 # Items, left to right. Each one is ONE of:
 #   { Widget = "cpu" }             live stat: cpu cores mem top net power temp
-#                                  fan battery clock load uptime
+#                                  fan battery clock load uptime kbd
 #   { Glyph = "\U000F057E" }       Nerd Font icon  (or Text = "esc")
 #   { Logo = true }                the Omarchy logo
 # plus optional:
@@ -34,7 +34,8 @@ LayerOrder = ["stats", "controls", "fkeys"]
 
 [Layers]
 stats = [
-    { Text = "esc", Action = "Esc", Stretch = 0.85 },
+    { Glyph = "\U000F00DE", Action = "BrightnessDown", Stretch = 0.85 },
+    { Glyph = "\U000F00E0", Action = "BrightnessUp", Stretch = 0.85 },
     { Logo = true, Layer = "controls", Stretch = 0.85 },
     { Widget = "cpu", Action = "Prog1" },
     { Widget = "cores", Action = "Prog1" },
@@ -68,19 +69,12 @@ controls = [
     { Glyph = "\U000F057E", Action = "VolumeUp" },
 ]
 
-# Held Fn.
-fkeys = [
-    { Text = "esc", Action = "Esc" },
-    { Text = "F1", Action = "F1" },
-    { Text = "F2", Action = "F2" },
-    { Text = "F3", Action = "F3" },
-    { Text = "F4", Action = "F4" },
-    { Text = "F5", Action = "F5" },
-    { Text = "F6", Action = "F6" },
-    { Text = "F7", Action = "F7" },
-    { Text = "F8", Action = "F8" },
-    { Text = "F9", Action = "F9" },
-    { Text = "F10", Action = "F10" },
-    { Text = "F11", Action = "F11" },
-    { Text = "F12", Action = "F12" },
+# Held Fn: keyboard backlight. Esc lives here too, since the M1 has no
+# physical Esc key. (IllumDown/IllumUp arrive as XF86KbdBrightnessDown/Up,
+# which Omarchy already binds.) Want F-keys back? Add F1..F12 Text buttons.
+keyboard = [
+    { Text = "esc", Action = "Esc", Stretch = 0.85 },
+    { Glyph = "\U000F030C \U000F0374", Action = "IllumDown", Stretch = 1.4 },
+    { Widget = "kbd", Stretch = 9.0 },
+    { Glyph = "\U000F030C \U000F0415", Action = "IllumUp", Stretch = 1.4 },
 ]

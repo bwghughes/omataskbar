@@ -40,6 +40,7 @@ pub struct Stats {
     pub temp_c: Option<f64>,
     pub fan_rpm: Option<u32>,
     pub battery: Option<Battery>,
+    pub kbd: Option<f64>,
     pub load: f64,
     pub uptime_s: u64,
 
@@ -57,6 +58,7 @@ struct Sensors {
     temps: Vec<String>,
     fan: Option<String>,
     battery: Option<String>,
+    kbd: Option<String>,
 }
 
 fn read(path: &str) -> Option<String> {
@@ -98,6 +100,12 @@ impl Sensors {
         }
         if s.temps.is_empty() {
             s.temps.push("/sys/class/thermal/thermal_zone0/temp".into());
+        }
+        if let Ok(leds) = fs::read_dir("/sys/class/leds") {
+            s.kbd = leds
+                .flatten()
+                .map(|l| l.path().to_string_lossy().into_owned())
+                .find(|p| p.ends_with("kbd_backlight"));
         }
         if let Ok(ps) = fs::read_dir("/sys/class/power_supply") {
             for p in ps.flatten() {
@@ -239,7 +247,16 @@ impl Stats {
         self.prev_net = Some((rx, tx));
     }
 
+    /// Re-read just the backlight levels, right after a brightness tap.
+    pub fn sample_levels(&mut self) {
+        self.kbd = self.sensors.kbd.as_deref().and_then(|k| {
+            let max = read_num(&format!("{k}/max_brightness")).filter(|m| *m > 0.0)?;
+            Some(read_num(&format!("{k}/brightness"))? / max)
+        });
+    }
+
     fn sample_sensors(&mut self) {
+        self.sample_levels();
         let s = &self.sensors;
         self.power_w = s.power.as_deref().and_then(read_num).map(|uw| uw / 1e6);
         self.fan_rpm = s.fan.as_deref().and_then(read_num).map(|r| r as u32);
